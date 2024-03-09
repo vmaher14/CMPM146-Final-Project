@@ -4,7 +4,6 @@ from util import *
 import items
 import dungeons
 import astar
-
         
 class Bite(items.MeleeAttackType):
     name = "bite"
@@ -329,7 +328,9 @@ class Inventory(BASEOBJ):
         [t for t in items.types if t[0] == type][0]
         # Return the list of items:
         it = [i for i in self.items if i[0].type == type]
-        it.sort(lambda a, b: cmp(a[1], b[1]))
+        #it.sort(lambda a, b: cmp(a[1], b[1]))  # CMPM 146 | sort items using cmp, not present in py3. Explicitly defined globally in utils.
+                                                # CMPM 146 | possible workaround: it = sorted(it)
+        it = sorted(it, key=lambda a: a[1])
         return it
         
 ######################### CREATURE FAMILIES ############################

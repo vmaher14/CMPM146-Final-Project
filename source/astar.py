@@ -67,8 +67,8 @@ def path(start_x, start_y, dest_x, dest_y, passable, max_length=99999):
             p = closed.path_from(node_x, node_y)
             return p
         # Check adjacent nodes:
-        for i in xrange(node_x -1 , node_x + 2):
-            for j in xrange(node_y - 1, node_y + 2):
+        for i in range(node_x -1 , node_x + 2): # CMPM146 | changed xrange to range. if a list is desired use list(range(...))
+            for j in range(node_y - 1, node_y + 2): # CMPM146 | changed xrange to range
                 dx, dy = i - node_x, j - node_y
                 # Skip the current node:
                 if (i, j) == (node_x, node_y): continue

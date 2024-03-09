@@ -13,6 +13,8 @@ import player
 import dungeons
 import io_curses as io
 
+import profile
+import pstats
 
 ####################### CLASS DEFINITIONS #######################
 
@@ -71,13 +73,26 @@ if __name__ == "__main__":
         Global.KeyBuffer = "a\naaRqy "
         seed(1)
     if PROFILE:
-        import hotshot, hotshot.stats
-        p = hotshot.Profile("pyro.prof")
+        #import hotshot, hotshot.stats
+        
+                # From https://docs.python.org/2/library/hotshot.html :
+
+                # hotshot was an experimental C module that focused on minimizing the overhead of profiling,
+                # at the expense of longer data post-processing times. It is no longer maintained and may be dropped
+                # in a future version of Python.
+                
+                # CMPM 146 | Found suggestions to use a newer profiler updated to Python3 such as profile or cProfile
+        p = profile.Profile("pyro.prof")
+        p.enable()
+        # p = hotshot.Profile("pyro.prof")
         p.runcall(StartGame)
         p.close()
-        stats = hotshot.stats.load("pyro.prof")
-        stats.strip_dirs()
-        stats.sort_stats("time", "calls")
-        stats.print_stats(20)
+        p.disable()
+        #stats = hotshot.stats.load("pyro.prof")
+        #stats.strip_dirs()
+        #stats.sort_stats("time", "calls")
+        #stats.print_stats(20)
+            # CMPM 146 | testing profile as profiler for stats
+        pstats.Stats(p).strip_dirs().sort_stats(pstats.SortKey.CALLS).print_stats()
     else:
         StartGame()

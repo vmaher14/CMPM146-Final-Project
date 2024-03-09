@@ -72,8 +72,9 @@ class Level(BASEOBJ):
                  if not(self.depth==1 and room==self.up_room)]
         for (x, y, w, h) in rooms:
             mobs = d("3d2-3")
-            for m in xrange(mobs):
-                for n in xrange(5): # Try at most 5 times to find a spot:
+            for m in range(mobs): # CMPM 146 | changed xrange to range
+                for n in range(5):  # Try at most 5 times to find a spot:
+                                    # CMPM 146 | changed xrange to range
                     i, j = irand(x, x+w-1), irand(y, y+h-1)
                     if not (self.CreaturesAt(i, j) or self.FeaturesAt(i, j)):
                         mob = creatures.RandomMob(self.depth)
@@ -87,7 +88,9 @@ class Level(BASEOBJ):
         mob = self.mob_actions.pop()
         mob.Update()
         self.mob_actions.append(mob)
-        self.mob_actions.sort(lambda a, b: cmp(b.timer, a.timer))
+        #self.mob_actions.sort(lambda a, b: cmp(b.timer, a.timer))
+        self.mob_actions = sorted(self.mob_actions, key=lambda a: a.timer) # CMPM 146 | sort by next lowest action timer
+        
     def Dirty(self, x, y):
         "Mark the given square as needing to be repainted."
         self.dirty[(x, y)] = True
@@ -130,8 +133,8 @@ class Level(BASEOBJ):
         painted = 0
         if Global.FullDungeonRefresh:
             Global.FullDungeonRefresh = False
-            for x in xrange(self.width):
-                for y in xrange(self.height):
+            for x in range(self.width): # CMPM 146 | changed xrange to range
+                for y in range(self.height): # CMPM 146 | changed xrange to range
                     painted += 1
                     self.PaintSquare(x, y)
         else:
@@ -313,7 +316,8 @@ class Staircase(Feature):
             self.tile = ["stairs_down"]
             self.name = "staircase down"
         else:
-            raise ValueErrror()
+            raise ValueError()  # CMPM 146 | changed ValueErrror() to ValueError.
+                                # Not sure why there was a typo here, checked to see if it was defined but doesn't seem like it.
     def Ascend(self, mob):
         if self.direction != "up":
             return False, "These stairs do not lead up."

@@ -62,7 +62,7 @@ class PlayerCharacter(creatures.Creature):
         # For debugging; allows "print pc" to give some info.
         return "Lv:%s St:%s Dx:%s Co:%s Iq:%s HP:%s MP:%s" % (
             self.level, self.str, self.dex, self.con, self.int, self.hp, self.mp)
-    def _init_commands(self):
+    def _init_commands(self): # CMPM 146 | Maybe look into changing movement commands to arrow keys
         self.commands = []
         self.commands.append(Command("Show inventory", 105, self.Inventory))
         self.commands.append(Command("Show equipped items", 73, self.EquippedInventory))        
@@ -479,7 +479,7 @@ class PlayerCharacter(creatures.Creature):
             else:
                 Global.IO.Message("You are once again subject to death.")
         def cheat_items():
-            for i in xrange(20):
+            for i in range(20): # CMPM 146 | changed xrange to range
                 while True:
                     dx, dy = irand(-3, 3), irand(-3, 3)
                     if dx*dx + dy*dy < 16: break

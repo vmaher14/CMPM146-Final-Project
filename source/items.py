@@ -462,7 +462,7 @@ def random_melee_weapon(level, w=None, nospecial=False):
         mod = -1
     else:
         mod = 1
-    for i in xrange(level-1):
+    for i in range(level-1): # CMPM 146 | changed xrange to range
         if rnd(0, 1) < 0.5:
             w.melee_attack.tohit += mod
         else:

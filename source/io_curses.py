@@ -260,17 +260,17 @@ class IOWrapper(BASEOBJ):
         max_y = 0
         for i in range(num):
             if doublewide:
-                max_item_width = (self.width - x) / 2 - 4
-                if i < num / 2 + num % 2:
+                max_item_width = int((self.width - x) // 2 - 4)
+                if i < num // 2 + num % 2:
                     # left side
                     X = x
                     Y = y+i
                 else:
                     # right side
-                    X = self.width / 2
-                    Y = y + i - num / 2 - num % 2
+                    X = self.width // 2
+                    Y = y + i - num // 2 - num % 2
             else:
-                max_item_width = self.width - x - 4
+                max_item_width = int(self.width - x - 4)
                 X = x
                 Y = y + i
             self.screen.addstr(Y, X, letters[i], key_attr)
@@ -575,8 +575,12 @@ class OptimizedScreen(BASEOBJ):
     def addstr(self, y, x, s, attr=c_white):
         strs = s.split("\n")
         for s in strs:
-            self.screen.addstr(y, x, s, self.colors[attr])
+            try:
+                self.screen.addstr(y, x, s, self.colors[attr]) # CMPM 146 | Not sure what is breaking here actually
+            except curses.error:
+                pass
             y += 1
+            self.colors
         return y - 1
     def addstr_color(self, y, x, text, attr=c_white):
         "addstr with embedded color code support."
@@ -612,8 +616,8 @@ class OptimizedScreen(BASEOBJ):
         return y
     def clear(self):
         self.dattr = self.colors[0]
-        self.chars = [[" "] * self.width for i in xrange(self.height)]
-        self.attrs = [[self.colors[0]] * self.width for i in xrange(self.height)]
+        self.chars = [[" "] * self.width for i in range(self.height)] # CMPM 146 | changed xrange to range
+        self.attrs = [[self.colors[0]] * self.width for i in range(self.height)] # CMPM 146 | changed xrange to range
         self.cursor = [0, 0]
         self.screen.clear()
         self.screen.refresh()

@@ -1,7 +1,9 @@
 "fov.py - FOV calculation for Pyro."
 
 from util import *
-from sets import Set
+# from sets import Set
+    # CMPM 146 | sets is deprecated in py3. the function set() is now a built-in class in py3 and can be used without import.
+    # This may break "dirty" square generation, might need to look into it
 
 FOV_RADIUS = 6
 OMNISCIENT_PLAYER = False
@@ -19,7 +21,7 @@ class FOVMap(BASEOBJ):
         self.level = level
         self.Blocked = blocked_function
         self.width, self.height = width, height
-        self.lit_now, self.was_lit = Set(), Set()
+        self.lit_now, self.was_lit = set(), set()
     def Lit(self, x, y):
         return (x, y) in self.lit_now
     def _set_lit(self, x, y, is_pc):
@@ -37,7 +39,7 @@ class FOVMap(BASEOBJ):
         if start < end:
             return
         radius_squared = (radius+0.5)*(radius+0.5)
-        for j in xrange(row, radius+1):
+        for j in range(row, radius+1): # CMPM 146 | changed xrange to range
             dx, dy = -j-1, -j
             blocked = False
             while dx <= 0:
@@ -79,15 +81,15 @@ class FOVMap(BASEOBJ):
             Global.pc.can_see_mobs = False
             for c in self.level.AllCreatures():
                 c.can_see_pc = False
-        self.was_lit, self.lit_now = self.lit_now, Set()
+        self.was_lit, self.lit_now = self.lit_now, set()
         self._set_lit(x, y, is_pc)
-        for oct in xrange(8):
+        for oct in range(8): # CMPM 146 | changed xrange to range
             self._cast_light(x, y, 1, 1.0, 0.0, radius,  
                              self.mult[0][oct], self.mult[1][oct],
                              self.mult[2][oct], self.mult[3][oct], 0, is_pc)
         if OMNISCIENT_PLAYER:
-            for i in xrange(self.width):
-                for j in xrange(self.height):
+            for i in range(self.width): # CMPM 146 | changed xrange to range
+                for j in range(self.height): # CMPM 146 | changed xrange to range
                     self._set_lit(i, j, False)
         #print "Was lit: %s, Lit now: %s, Newly lit: %s" % (len(self.was_lit.keys()), len(self.lit_now.keys()), len(self.newly_lit.keys()))
         # The set symmetric difference (a^b) gives members in one set but not both,

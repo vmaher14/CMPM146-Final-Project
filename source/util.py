@@ -2,14 +2,15 @@
 
 # Attempt to import and use Psyco, the Python specializing compiler:
 try:
-    #raise ImportError   # Disable Psyco for now
+    #raise ImportError   # Disable Psyco for now # CMPM 146 | This still raises in ImportError in python3, the except branch will follow so no changes.
     import psyco
     psyco.full()
     BASEOBJ = psyco.compact
 except ImportError:
     BASEOBJ = object
-
+    
 import curses
+import functools # CMPM 146 | reduce was moved to functools in python3 rather than built-in.
 from random import choice, randint, uniform as rnd, normalvariate as norm, seed
 from math import ceil
 
@@ -125,6 +126,9 @@ class Logger(BASEOBJ):
 
 ####################### GLOBAL FUNCTIONS ########################
 
+def cmp(a, b):
+    return (a > b) - (a < b) 
+
 def d(p1, p2=None):
     "Roll dice"
     try:
@@ -164,7 +168,7 @@ def irand(a, b, n=1):
     if a > b:
         a, b = b, a
     t = 0
-    for i in xrange(n):
+    for i in range(n): # CMPM 146 | changed xrange to range
         t += randint(a, b)
     return int(round(t / n))
 
@@ -175,7 +179,7 @@ except NameError:
     def sum(data):
         if len(data) == 0:
             return 0
-        return reduce(add, data)
+        return functools.reduce(add, data) # CMPM 146 | changed reduce to functools.reduce
 
 def wrap(text, width):
     """
@@ -183,7 +187,7 @@ def wrap(text, width):
     and most spaces in the text. Expects that existing line
     breaks are posix newlines (\n).
     """
-    return reduce(lambda line, word, width=width: '%s%s%s' %
+    return functools.reduce(lambda line, word, width=width: '%s%s%s' % # CMPM 146 | changed reduce to functools.reduce
                   (line,
                    ' \n'[(len(line)-line.rfind('\n')-1
                          + len(word.split('\n',1)[0]
@@ -242,7 +246,7 @@ def successful_hit(differential, level=1):
 
 def clen(s):
     "Return the length of a string, excluding embedded color codes."
-    for c in msg_colors.keys() + ["0"]:
+    for c in list(msg_colors) + ["0"]: # CMPM 146 | dict_keys and list TypeError, changed to represent dict_keys as list
         s = s.replace("^"+c+"^", "")
     return len(s)
     

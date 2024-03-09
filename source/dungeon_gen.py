@@ -93,7 +93,7 @@ class Level(BASEOBJ):
             y = irand(1, self.level_height - h - 1)
             free = self.area_free(x, y, w, h)
             if STEP:
-                print "Free is: %s" % free
+                print("Free is: %s" % free) # CMPM 146 | print change, free returns string literal
             if free:
                 # The area is free; dig out the room:
                 for i in range(w):
@@ -165,7 +165,7 @@ class Level(BASEOBJ):
             while not (self.adjacent_to(x, y, FLOOR) or self.adjacent_to(x, y, CORRIDOR_FLOOR)):
                 if STEP:
                     self.display()
-                    raw_input()
+                    input() # CMPM 146 | raw_input() has been changed to input() in py3. Need to see what this change does
                 if self.adjacent_to(x, y, TEMP_ROOM) and length > 1:
                     break
                 if self.adjacent_to(x, y, TEMP_CORRIDOR) > 1:
@@ -262,10 +262,10 @@ class Level(BASEOBJ):
                     num += 1
         return num
     def display(self):
-        print "-" * 78
+        print("-" * 78)
         for line in self.data:
-            print ''.join(line)
-        print "-" * 78
+            print(''.join(line))
+        print("-" * 78)
     def cosmetic(self):
         # Make it look like a gameplay screen by hiding walls:
         self.bake(CORRIDOR_FLOOR, FLOOR)
