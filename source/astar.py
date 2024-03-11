@@ -11,7 +11,8 @@ class NodeList(BASEOBJ):
         self.nodes, self.idx = [], {}
         self.name = name
     def has(self, x, y):
-        return self.idx.has_key((x, y))
+        # return self.idx.has_key((x, y))
+        return (x, y) in self.idx 
     def add(self, x, y, cost, h, parent_x, parent_y):
         if self.has(x, y):
             raise ValueError

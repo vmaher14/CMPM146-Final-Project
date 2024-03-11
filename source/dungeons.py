@@ -4,6 +4,7 @@ from util import *
 import dungeon_gen
 import fov
 import creatures
+from functools import cmp_to_key
 
 class Dungeon(BASEOBJ):
     "An entire multilevel dungeon."
@@ -82,15 +83,23 @@ class Level(BASEOBJ):
                         break
                 else:
                     log("Mob bailout on level %s" % self.depth)
+
+    
+
+    def compare(self, a, b):
+        return (b.timer > a.timer) - (b.timer < a.timer)
+    
     def Update(self):
         "Execute a single game turn."
         # Pull off the first mob, update it, stick it back in, sort:
         mob = self.mob_actions.pop()
         mob.Update()
         self.mob_actions.append(mob)
-        #self.mob_actions.sort(lambda a, b: cmp(b.timer, a.timer))
-        self.mob_actions = sorted(self.mob_actions, key=lambda a: a.timer) # CMPM 146 | sort by next lowest action timer
-        
+        # self.mob_actions.sort(lambda a, b: cmp(b.timer, a.timer))
+        # self.mob_actions = sorted(self.mob_actions, key=lambda a: a.timer, reverse=True)
+        # self.mob_actions = sorted(self.mob_actions, key=lambda a: a.timer) # CMPM 146 | sort by next lowest action timer
+        self.mob_actions = sorted(self.mob_actions, key=lambda a: a.timer, reverse=True)
+
     def Dirty(self, x, y):
         "Mark the given square as needing to be repainted."
         self.dirty[(x, y)] = True
