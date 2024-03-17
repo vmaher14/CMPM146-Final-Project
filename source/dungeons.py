@@ -5,6 +5,7 @@ import dungeon_gen
 import fov
 import creatures
 from functools import cmp_to_key
+import items
 
 class Dungeon(BASEOBJ):
     "An entire multilevel dungeon."
@@ -42,6 +43,12 @@ class Level(BASEOBJ):
         # Add some fire because I promised I would:
         x, y = self.RandomSquare()
         self.AddFeature(SmallFire(), x, y)
+
+        # CMPM 146 | Potions spawn randomly
+        for i in range(1):
+            xx, yy = self.RandomSquare()
+            self.AddItem(items.Potion(), xx, yy)
+
         self.fov = fov.FOVMap(self, self.width, self.height, self.BlocksVision)
     def _add_doors(self):
         "Remove the door terrain and put door features in its place."
@@ -360,3 +367,4 @@ class SmallFire(Feature):
     color = c_Red
     tile = ["fire"]
     name = "small fire"
+    
