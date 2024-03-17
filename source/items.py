@@ -408,7 +408,14 @@ class SmallBag(Tool):
     name = "small bag"
     reduction = 0.05
     slots = 10    
+
     
+class Potion(Item):
+    color = c_Blue
+    tile = ["potion"]
+    name = "Potion"
+    type = "Potions"
+    desc = "A super duper magical drink that heals"
 
 class Jewelry(Item):
     is_jewelry = True

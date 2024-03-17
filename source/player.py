@@ -73,6 +73,7 @@ class PlayerCharacter(creatures.Creature):
         self.commands.append(Command("Auto-run", 47, self.BeginAutoRun))
         self.commands.append(Command("Rest until 100 turns or healed", 82, self.BeginAutoRest))
         self.commands.append(Command("Examine an item", 120, self.ExamineItem))
+        self.commands.append(Command("Use a item", 46, self.UseItem))
         self.commands.append(Command("Close a door", 99, self.CloseDoor))
         self.commands.append(Command("Ascend staircase", 60, self.AscendStairs))
         self.commands.append(Command("Descend staircase", 62, self.DescendStairs))
@@ -360,6 +361,17 @@ class PlayerCharacter(creatures.Creature):
                 if r is None: return False
                 self.Unequip(r)
         self.Equip(item)
+    def UseItem(self):
+        item = Global.IO.GetItemFromInventory(self, "Use which item?")
+        if item is None: return False
+        if item.type == "Potions":
+            self.hp += 5
+            if self.hp > self.hp_max:
+                dif = self.hp - self.hp_max
+                self.hp -= dif
+            self.inventory.Remove(item)
+
+
     def ExamineItem(self):
         "Show a detailed description of an item."
         item = Global.IO.GetItemFromInventory(self, "Examine which item?")
