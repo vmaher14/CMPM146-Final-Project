@@ -45,7 +45,7 @@ class Level(BASEOBJ):
         self.AddFeature(SmallFire(), x, y)
 
         # CMPM 146 | Potions spawn randomly
-        for i in range(1):
+        for _ in range(2):
             xx, yy = self.RandomSquare()
             self.AddItem(items.Potion(), xx, yy)
 
