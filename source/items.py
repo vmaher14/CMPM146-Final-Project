@@ -409,7 +409,7 @@ class SmallBag(Tool):
     reduction = 0.05
     slots = 10    
 
-    
+# CMPM 146 | Added Potion item class
 class Potion(Item):
     color = c_Blue
     tile = ["potion"]

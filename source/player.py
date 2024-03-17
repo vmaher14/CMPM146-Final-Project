@@ -361,15 +361,16 @@ class PlayerCharacter(creatures.Creature):
                 if r is None: return False
                 self.Unequip(r)
         self.Equip(item)
+    
+    # CMPM 146 | Added UseItem() function
     def UseItem(self):
         item = Global.IO.GetItemFromInventory(self, "Use which item?")
         if item is None: return False
         if item.type == "Potions":
             self.hp += 5
             if self.hp > self.hp_max:
-                dif = self.hp - self.hp_max
-                self.hp -= dif
-            self.inventory.Remove(item)
+                self.hp = self.hp_max
+        self.inventory.Remove(item)
 
 
     def ExamineItem(self):
