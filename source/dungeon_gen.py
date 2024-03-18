@@ -16,6 +16,9 @@ STEP = False
 
 ## Original Width, height: 79, 21
 class Level(BASEOBJ):
+    # CMPM 146 | Variable to keep track of number of spawned locked doors
+    locked_count = 0
+
     def __init__(self, level_width = 79, level_height = 21,
                  room_min_width = 5, room_max_width = 13,
                  room_min_height = 3, room_max_height = 7, 
@@ -238,9 +241,10 @@ class Level(BASEOBJ):
             for j in range(self.level_height):
                 if self.data[j][i] == CORRIDOR_FLOOR and self.adjacent_to(i, j, FLOOR):
                     # CMPM 146 | Spawn a locked door
-                    # 10% chance of locked door spawning (This can be changed I just set this rate fore testing)
-                    if randint(0, 9) == 5:
+                    # 10% chance of locked door spawning (This can be changed I just set this rate for testing)
+                    if randint(0, 9) == 1:
                         self.data[j][i] = LOCKED_DOOR
+                        Level.locked_count += 1
                     else:
                         self.data[j][i] = DOOR
 

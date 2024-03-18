@@ -49,9 +49,10 @@ class Level(BASEOBJ):
             x, y = self.RandomSquare()
             self.AddItem(items.Potion(), x, y)
         
-        # CMPM 146 | A key spawns randomly
-        x, y = self.RandomSquare()
-        self.AddItem(items.Key(), x, y)
+        # CMPM 146 | A key spawns randomly depending on the number of locked doors that spawn
+        for _ in range(dungeon_gen.Level.locked_count):
+            x, y = self.RandomSquare()
+            self.AddItem(items.Key(), x, y)
 
         self.fov = fov.FOVMap(self, self.width, self.height, self.BlocksVision)
     def _add_doors(self):
