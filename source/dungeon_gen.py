@@ -233,14 +233,12 @@ class Level(BASEOBJ):
             self.bake(TEMP_CORRIDOR, WALL)
             return False
     def add_doors(self):
-        count = 0
         "Add doors where passages meet rooms"
         for i in range(self.level_width):
             for j in range(self.level_height):
                 if self.data[j][i] == CORRIDOR_FLOOR and self.adjacent_to(i, j, FLOOR):
                     # CMPM 146 | Spawn a locked door
                     # 10% chance of locked door spawning (This can be changed I just set this rate fore testing)
-                    count += 1
                     if randint(0, 9) == 5:
                         self.data[j][i] = LOCKED_DOOR
                     else:
