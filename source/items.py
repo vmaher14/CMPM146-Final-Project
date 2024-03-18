@@ -17,6 +17,7 @@ types = [
     ("Tools", "~"),
     ("Comestibles", "%"),
     ("Valuables", "$"),
+    ("Keys", "K"),
     ("Other", "-"),
 ]
 
@@ -416,6 +417,14 @@ class Potion(Item):
     name = "Potion"
     type = "Potions"
     desc = "A super duper magical drink that heals"
+
+# CMPM 146 | Added Key item class
+class Key(Item):
+    color = c_yellow
+    tile = ["key"]
+    name = "Key"
+    type = "Keys"
+    desc = "A key used to unlock a door"
 
 class Jewelry(Item):
     is_jewelry = True

@@ -46,8 +46,12 @@ class Level(BASEOBJ):
 
         # CMPM 146 | Potions spawn randomly
         for _ in range(2):
-            xx, yy = self.RandomSquare()
-            self.AddItem(items.Potion(), xx, yy)
+            x, y = self.RandomSquare()
+            self.AddItem(items.Potion(), x, y)
+        
+        # CMPM 146 | A key spawns randomly
+        x, y = self.RandomSquare()
+        self.AddItem(items.Key(), x, y)
 
         self.fov = fov.FOVMap(self, self.width, self.height, self.BlocksVision)
     def _add_doors(self):
@@ -57,6 +61,10 @@ class Level(BASEOBJ):
                 if self.layout.data[y][x] == DOOR:
                     self.layout.data[y][x] = FLOOR
                     self.AddFeature(Door(), x, y)
+                # CMPM 146 | Place a locked door
+                if self.layout.data[y][x] == LOCKED_DOOR:
+                    self.layout.data[y][x] = FLOOR
+                    self.AddFeature(LockedDoor(), x, y)
     def _add_stairs(self):
         "Add at least one up and one down staircase, not in the same room."
         self.up_room = choice(self.layout.rooms)
@@ -318,6 +326,47 @@ class Door(Feature):
             self.current_level.Dirty(self.x, self.y)
             if mob.is_pc:
                 return True, "You close the door."
+
+# CMPM 146 | Class for locked doors feature
+class LockedDoor(Feature):
+    name = "locked_door"
+    describe = False
+    def __init__(self):
+        Feature.__init__(self)
+        self.closed = True
+        self.tile = ["locked_door"]
+        self.color = c_yellow
+        self.block_type = WALL  # Impassable while closed.
+    def FailedMove(self, mob):
+        self.Open(mob)
+    def Open(self, mob):
+        if self.closed and mob.can_open_locked_doors:
+            self.closed = False
+            self.tile = ["door_open"]
+            self.block_type = FLOOR
+            # Opening is faster than closing to prevent an open-close dance with mobs
+            mob.timer += delay(mob.move_speed * 1.5)
+            self.current_level.Dirty(self.x, self.y)
+            return True
+        else:
+            Global.IO.Message("You need a key to unlock this door")
+        return False
+    def Close(self, mob):
+        if not self.closed:
+            for creature in self.current_level.CreaturesAt(self.x, self.y):
+                return False, "The %s is blocking the door." % creature.name
+            for item in self.current_level.ItemsAt(self.x, self.y):
+                return False, "An item is keeping the door from closing."
+            self.closed = True
+            self.tile = ["door_closed"]
+            self.block_type = WALL
+            mob.timer += delay(mob.move_speed)
+            self.current_level.Dirty(self.x, self.y)
+            if mob.is_pc:
+                return True, "You close the door."
+
+
+
 class Staircase(Feature):
     color = c_white
     block_type = FLOOR

@@ -24,6 +24,7 @@ tiles = {
     "wall":             "#",
     "door_open":        "/",
     "door_closed":      "+",
+    "locked_door":      "X",
     "trap":             "^",
     "stairs_up":        "<",
     "stairs_down":      ">",
@@ -71,6 +72,7 @@ tiles = {
     "corpse":           "%",
     "ammunition":       "|",
     "money":            "$",
+    "key":              "K",
     # Misc:
     "unknown":          ";",
     "blank":            " ",
