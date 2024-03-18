@@ -446,3 +446,8 @@ def RandomMob(level):
     mobs = [(mob, mob.rarity) for mob in all if -1 <= level - mob.level <= 1]
     mob = weighted_choice(mobs)
     return mob()
+
+def PossibleMobs(level):
+    possible = [(mob, mob.rarity) for mob in all if -1 <= level - mob.level <= 1]
+    possible.append(None)
+    return possible
