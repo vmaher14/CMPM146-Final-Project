@@ -307,6 +307,7 @@ class PlayerCharacter(creatures.Creature):
                 for item, _ in self.inventory.items:
                     if isinstance(item, items.Key):
                         self.inventory.Remove(item)
+                        self.can_open_locked_doors = False
                 # self.inventory.Remove() 
             else:
                 success, msg = False, "You need a key to unlock this door"
