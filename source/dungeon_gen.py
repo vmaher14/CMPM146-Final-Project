@@ -39,6 +39,7 @@ class Level(BASEOBJ):
         return "\n".join(["".join(row) for row in self.data])
     def generate(self):
         "Add rooms, passages, doors, etc"
+        Level.locked_count = 0  # CMPM 146 | Reset count of locked_doors
         while self.add_room():
             self.bake(TEMP_ROOM, FLOOR)
         self.add_doors()
