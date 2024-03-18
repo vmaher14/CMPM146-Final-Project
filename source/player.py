@@ -14,6 +14,7 @@ class PlayerCharacter(creatures.Creature):
     tile = ["player"]
     color = c_White
     can_open_doors = True
+    can_open_locked_doors = False # CMPM 146 | Becomes true when player has a key in their inventory
     is_pc = True
     AIType = None       # The player makes the calls
     unarmed = items.Punch()
@@ -73,7 +74,8 @@ class PlayerCharacter(creatures.Creature):
         self.commands.append(Command("Auto-run", 47, self.BeginAutoRun))
         self.commands.append(Command("Rest until 100 turns or healed", 82, self.BeginAutoRest))
         self.commands.append(Command("Examine an item", 120, self.ExamineItem))
-        self.commands.append(Command("Use a item", 46, self.UseItem))
+        self.commands.append(Command("Use a item", 46, self.UseItem)) # CMPM 146 | Added UseItem command (key: .)
+        self.commands.append(Command("Unlock a door", 117, self.OpenLockedDoor)) # CMPM 146 | Added OpenLockedDoor command (key: u)
         self.commands.append(Command("Close a door", 99, self.CloseDoor))
         self.commands.append(Command("Ascend staircase", 60, self.AscendStairs))
         self.commands.append(Command("Descend staircase", 62, self.DescendStairs))
@@ -260,7 +262,7 @@ class PlayerCharacter(creatures.Creature):
         for x, y in adj:
             try:
                 door = [f for f in self.current_level.FeaturesAt(x, y)
-                        if f.name == "door" and not f.closed][0]
+                        if (f.name == "door" or f.name == "locked_door") and not f.closed][0]
                 doors.append((x, y, door))
             except IndexError:
                 continue
@@ -278,12 +280,39 @@ class PlayerCharacter(creatures.Creature):
             else:
                 try:
                     door = [f for f in self.current_level.FeaturesAt(
-                        self.x+dx, self.y+dy) if f.name=="door" and not f.closed][0]
+                        self.x+dx, self.y+dy) if (f.name=="door" or f.name=="locked_door") and not f.closed][0]
                     success, msg = door.Close(self)
                 except IndexError:
                     success, msg = False, "There is no door there to close."
         Global.IO.Message(msg)
         return success
+    
+    # CMPM 146 | Function for opening locked doors
+    def OpenLockedDoor(self):
+        adj = self.current_level.AdjacentSquares(self.x, self.y)
+        doors = []
+        for x, y in adj:
+            try:
+                door = [f for f in self.current_level.FeaturesAt(x, y)
+                        if f.name == "locked_door" and f.closed][0]
+                doors.append((x, y, door))
+            except IndexError:
+                continue
+        if len(doors) == 0:
+            success, msg = False, "There is nothing nearby to open."
+        elif len(doors) == 1:
+            # Just one door adjacent;
+            if self.HasKey(self):
+                success, msg = door.Open(self), "You unlocked the door"
+                for item, _ in self.inventory.items:
+                    if isinstance(item, items.Key):
+                        self.inventory.Remove(item)
+                # self.inventory.Remove() 
+            else:
+                success, msg = False, "You need a key to unlock this door"
+        Global.IO.Message(msg)
+        return success
+
     def Inventory(self):
         Global.IO.DisplayInventory(self)
         Global.IO.GetKey()
@@ -370,8 +399,22 @@ class PlayerCharacter(creatures.Creature):
             self.hp += 5
             if self.hp > self.hp_max:
                 self.hp = self.hp_max
-        self.inventory.Remove(item)
+        
+        self.inventory.Remove(item)   
 
+    # CMPM 146 | Added function to check if player has a key
+    def HasKey(self, mob):
+        key_found = False
+        for item, _ in mob.inventory.items:
+            if isinstance(item, items.Key):
+                key_found = True
+                mob.can_open_locked_doors = True
+                break
+        return key_found
+    
+    
+
+        
 
     def ExamineItem(self):
         "Show a detailed description of an item."
@@ -537,9 +580,8 @@ class PlayerInventory(creatures.Inventory):
                     and i[0] != self.mob.wielded]) * self.mob.bag.reduction
         return eq + pack
     def CanHold(self, item):
-        return item.weight * self.mob.bag.reduction + self.TotalWeight() <= self.Capacity()
-    
-        
+        return item.weight * self.mob.bag.reduction + self.TotalWeight() <= self.Capacity()  
+       
         
 ################################ GODS AND RACES #########################################
 

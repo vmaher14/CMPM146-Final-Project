@@ -339,7 +339,7 @@ class Humanoid(Creature):
     color = c_White
 class Rodent(Creature):
     tile = ["rodent"]
-    color = c_yellow
+    color = c_red
 class Kobold(Creature):
     tile = ["kobold"]
     color = c_Green
@@ -351,7 +351,7 @@ class Goblin(Humanoid):
 
 class Rat(Rodent):
     name = "rat"
-    color = c_yellow
+    color = c_red
     hp_max = 5
     dex, str = 6, 8
     level = 1

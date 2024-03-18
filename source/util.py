@@ -31,7 +31,8 @@ letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 WALL = "#"
 FLOOR = "."
 DOOR = "+"
-DUNGEON_CHARS = (WALL, FLOOR, DOOR)
+LOCKED_DOOR = "X"
+DUNGEON_CHARS = (WALL, FLOOR, DOOR, LOCKED_DOOR)
 
 # Literal colors:
 c_black = curses.COLOR_BLACK
