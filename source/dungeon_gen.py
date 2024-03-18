@@ -238,7 +238,6 @@ class Level(BASEOBJ):
             return False
     def add_doors(self):
         "Add doors where passages meet rooms"
-        Level.locked_count = 0
         for i in range(self.level_width):
             for j in range(self.level_height):
                 if self.data[j][i] == CORRIDOR_FLOOR and self.adjacent_to(i, j, FLOOR):
