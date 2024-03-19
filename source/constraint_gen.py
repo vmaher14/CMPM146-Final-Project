@@ -1,7 +1,9 @@
 from random import randrange
 import creatures
 import itertools
+import dungeon_gen
 from util import *
+import random
 
 # mob = creatures.RandomMob(self.depth)
 
@@ -37,17 +39,17 @@ def scoring_mobs(mob_set):
         stat_avg = (mob.hp_max + mob.str + mob.int + mob.dex + mob.level) // 5
         # ie. rats floored average of 3, wolves 4
         if mob == creatures.Rat:
-            score -= 1
+            score -= 4
         elif mob == creatures.WimpyKobold:
-            score -= 7
+            score -= 6
         elif mob == creatures.WimpyGoblin:
-            score -= 10
+            score -= 8
         elif mob == creatures.Wolf:
             score -= 3
         elif mob == creatures.Imp:
             score -= 2
         elif mob == creatures.Ogre:
-            score -= 65
+            score -= 15
     return score
 
 
@@ -113,11 +115,19 @@ def monsterPossibilities(Level):
 # mobtest = [None, "Rat", "Wolf"]
 # domain = list(itertools.combinations_with_replacement(mobtest, 3))
 # print(domain)
+            
+def getSingleton(inSet):
+    if(len(inSet) == 1):
+        return list(inSet)[0]
+    else:
+        return False
     
 class ConstraintSolver(BASEOBJ):
     def __init__(self, Level):
         self.level = Level
         self.undoStack = []
+        self.potions = 0
+        self.rooms = Level.rooms
         self.monsterAssignment = monsterPossibilities(self.level)
         self.potionAssignment = potionPossibilities(self.level)
         self.keyAssignment = keysPossibilities(self.level)
@@ -129,6 +139,13 @@ class ConstraintSolver(BASEOBJ):
         self.solveKeys()
 
     def solveSurvivability(self):
+        self.randomisePotions()
+        allSingle = True
+        for i in range(len(self.monsterAssignment)):
+            if len(self.monsterAssignment[i]) > 1:
+                allSingle = False
+        if(allSingle):
+            return
         i = randint(0, len(self.rooms) - 1)
         while(len(self.monsterAssignment[i]) <= 1):
             i = randint(0, len(self.rooms) - 1)
@@ -140,10 +157,9 @@ class ConstraintSolver(BASEOBJ):
             except:
                 while(len(self.undoStack) > frame):
                     index, set = self.undoStack.pop()
-                    self.monsterAssignment[index] = set                   
+                    self.monsterAssignment[index] = set                         
 
-    def solveKeys(self):
-        pass
+    
 
     def narrowMonsters(self, i, setS):
         newSet = set()
@@ -188,3 +204,25 @@ class ConstraintSolver(BASEOBJ):
 
     def propagateSurvivability(self):
         pass
+        possible = []
+        score = 20 + self.potions * 5
+        for i in range(len(self.monsterAssignment)):
+            result = getSingleton(self.monsterAssignment[i])
+            if not result:
+                possible.append(tuple(i, self.monsterAssignment[i]))
+            else:
+                score -= scoring_mobs(result)
+        if score <= 0:
+            Exception
+        for index, possibilities in possible:
+            newSet = set()
+            for member in possibilities:
+                if score - scoring_mobs(member) > 0:
+                    newSet.add(member)
+            if(len(newSet) == 0):
+                Exception
+            self.narrowMonsters(index, newSet)
+
+
+
+
