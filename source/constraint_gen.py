@@ -155,13 +155,36 @@ class ConstraintSolver(BASEOBJ):
             self.propagateSurvivability()
 
     def narrowPotions(self, finiteDomain, setS):
-        pass
+        newSet = set()
+        if not finiteDomain:
+            raise Exception("Potion Domain Error")
+        for potionArrangement in self.potionAssignment[finiteDomain]:
+            if potionArrangement in setS:
+                newSet.add(potionArrangement)
+        if newSet != self.potionAssignment[finiteDomain]:
+            self.undoStack.append(tuple(finiteDomain, self.potionAssignment[finiteDomain]))
+            self.propagateSurvivability()
 
     def narrowKeys(self, finiteDomain, setS):
-        pass
+        newSet = set()
+        if not finiteDomain:
+            raise Exception("Key Domain Error")
+        for keyArrangement in self.keyAssignment[finiteDomain]:
+            if keyArrangement in setS:
+                newSet.add(keyArrangement)
+        if newSet != self.keyAssignment[finiteDomain]:
+            self.undoStack.append(tuple(finiteDomain, self.keyAssignment[finiteDomain]))
+        
 
     def narrowLocks(self, finiteDomain, setS):
-        pass
+        newSet = set()
+        if not finiteDomain:
+            raise Exception("Lock Domain Error")
+        for lockArrangement in self.lockAssignment[finiteDomain]:
+            if lockArrangement in setS:
+                newSet.add(lockArrangement)
+        if newSet != self.lockAssignment[finiteDomain]:
+            self.undoStack.append(tuple(finiteDomain, self.lockAssignment[finiteDomain]))
 
     def propagateSurvivability(self):
         pass

@@ -1,7 +1,7 @@
 "items.py - Pyro items"
 
 from util import *
-import creatures
+# import creatures
 
 types = [
     ("Melee Weapons", "("),

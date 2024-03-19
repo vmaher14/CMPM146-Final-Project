@@ -5,10 +5,10 @@ Pyro: PYthon ROguelike by Eric D. Burgess, 2006
 
 # Pyro modules:
 from util import *
-import races
-import professions
-import creatures
-import items
+# import races
+# import professions
+# import creatures
+# import items
 import player
 import dungeons
 import io_curses as io

@@ -7,7 +7,7 @@ import races
 import professions
 import items
 import fov
-import dungeons
+# import dungeons
 
 class PlayerCharacter(creatures.Creature):
     "The player character."
@@ -470,13 +470,13 @@ class PlayerCharacter(creatures.Creature):
         self.run_count += 1
         self.ran.append((self.x, self.y))
         mx, my = None, None
-        if self.run_count > 1:
-            for dx, dy in offsets:
-                if ((dx == 0 or dy == 0) and (dx != dy )
-                    and (self.x+dx != self.prev_x or self.y+dy != self.prev_y)):
-                    for F in self.current_level.FeaturesAt(self.x+dx, self.y+dy):
-                        if isinstance(F, dungeons.Door):
-                            self.running = False
+        # if self.run_count > 1:
+        #     for dx, dy in offsets:
+        #         if ((dx == 0 or dy == 0) and (dx != dy )
+        #             and (self.x+dx != self.prev_x or self.y+dy != self.prev_y)):
+        #             for F in self.current_level.FeaturesAt(self.x+dx, self.y+dy):
+        #                 if isinstance(F, dungeons.Door):
+        #                     self.running = False
         if self.can_see_mobs:
             self.running = False
         if self.run_in_room:

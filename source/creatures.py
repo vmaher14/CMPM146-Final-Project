@@ -4,7 +4,10 @@ from util import *
 import items
 import dungeons
 import astar
-        
+    
+creatures_killed = 0
+
+
 class Bite(items.MeleeAttackType):
     name = "bite"
     verbs = ["nibbles at", "bites", "chomps"]  # no damage, hit, crit
@@ -139,6 +142,8 @@ class Creature(BASEOBJ):
     def Die(self):
         # Creature has been reduced to <=0 hp, or otherwise should die:
         self.inventory.DropAll()
+        global creatures_killed
+        creatures_killed += 1
         self.current_level.RemoveCreature(self)
         self.dead = True
     def ArticleName(self, article="the"):
@@ -447,7 +452,7 @@ def RandomMob(level):
     mob = weighted_choice(mobs)
     return mob()
 
-def PossibleMobs(level):
+def PossibleMobs(level): # CMPM 146
     possible = [(mob, mob.rarity) for mob in all if -1 <= level - mob.level <= 1]
     possible.append(None)
     return possible
