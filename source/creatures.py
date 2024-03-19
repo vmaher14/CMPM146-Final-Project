@@ -353,7 +353,7 @@ class Rat(Rodent):
     name = "rat"
     color = c_red
     hp_max = 5
-    dex, str = 6, 8
+    str, dex, int = 6, 6, 0
     level = 1
     attacks = [
         [Claw("1d2", 100), 2],
