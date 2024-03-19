@@ -14,6 +14,9 @@ def temp_tiles(num):
 
 STEP = False
 
+from collections import deque
+
+
 ## Original Width, height: 79, 21
 class Level(BASEOBJ):
     # CMPM 146 | Variable to keep track of number of spawned locked doors
@@ -35,6 +38,9 @@ class Level(BASEOBJ):
             self.data.append([WALL]*self.level_width)
         self.rooms = []
         self.generate()
+        # self.roomConnections()
+        self.test_func()
+        
     def __str__(self):
         return "\n".join(["".join(row) for row in self.data])
     def generate(self):
@@ -87,6 +93,63 @@ class Level(BASEOBJ):
                     if self.adjacent_to(x+w-1, j, FLOOR):
                         return "room"
             return "clear"
+        
+    # CMPm 146 | Helper function that returns index of room given coordinates, returns None if coordinates not in a valid room
+    def get_room_at_position(self, x, y):
+        # Check if the position is part of a room
+        for idx, (room_x, room_y, room_w, room_h) in enumerate(self.rooms):
+            if room_x <= x < room_x + room_w and room_y <= y < room_y + room_h:
+                return idx
+        return None
+    
+
+    # CMPm 146 | Just using this for testing
+    def test_func(self):
+        for idx, (x, y, w, h) in enumerate(self.rooms):
+            print(idx, x,y,w,h)
+            print(self.find_connections(x, y, idx))
+
+    # CMPM 146
+    def find_connections(self, x, y, room_idx):
+        connections = set()
+
+        # Directions to search around the current tile
+        directions = [(0, -1), (1, 0), (0, 1), (-1, 0)]
+
+        # Queue for BFS
+        queue = deque([(x, y)])
+
+        # Visited set to keep track of visited tiles
+        visited = set([(x, y)])
+
+        # Perform BFS
+        while queue:
+            cx, cy = queue.popleft()
+            # Check each direction
+            for dx, dy in directions:
+                nx, ny = cx + dx, cy + dy
+                # Continue searching until a door tile is found
+                while 0 <= nx < self.level_width and 0 <= ny < self.level_height:
+                    if self.data[ny][nx] == DOOR:
+                        # Check if the adjacent tile belongs to a different room
+                        for x, y, in directions:
+                            xx, yy = nx + x, ny + y
+                            idx = self.get_room_at_position(xx, yy)
+                            if idx and idx != room_idx:
+                                connections.add(idx)
+                        # Stop searching in this direction once a door is found
+                                break
+                    if self.data[ny][nx] == WALL:
+                        # Stop searching in this direction if a wall is hit
+                        break
+                    if self.data[ny][nx] == FLOOR and (nx, ny) not in visited:
+                        queue.append((nx, ny))
+                        visited.add((nx, ny))
+                    nx += dx
+                    ny += dy
+                    
+        return connections
+            
     def add_room(self):
         for t in range(self.room_tries):
             # Try at most X times to add a room, then give up:
@@ -99,7 +162,9 @@ class Level(BASEOBJ):
             free = self.area_free(x, y, w, h)
             if STEP:
                 print("Free is: %s" % free) # CMPM 146 | print change, free returns string literal
+            
             if free:
+                
                 # The area is free; dig out the room:
                 for i in range(w):
                     for j in range(h):
@@ -134,6 +199,7 @@ class Level(BASEOBJ):
                         self.rooms.append((x, y, w, h))
                         return True
                 self.rooms.append((x, y, w, h))
+                
                 return True
         return False
     def add_passage(self, rx, ry, rw, rh, dirs=[0,1,2,3]):
@@ -247,10 +313,7 @@ class Level(BASEOBJ):
                         self.data[j][i] = LOCKED_DOOR
                         Level.locked_count += 1
                     else:
-                        self.data[j][i] = DOOR
-
-                
-                    
+                        self.data[j][i] = DOOR  
 
         for i in range(self.level_width):
             for j in range(self.level_height):
