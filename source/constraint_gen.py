@@ -95,22 +95,23 @@ def monsterPossibilities(Level):
     monsterDomain = []
     #First create the standard domain 
     #Initialize with an empty tuple representing no monsters in the room
-    defaultDomain = set(tuple())
+    defaultDomain = {()}
     # all possible mobs for this layer
     all = possibleMobs(Level.depth)
     # adds the 1s, 2s, and 3s in one fell swoop
     for i in range(len(all)):
-        defaultDomain.add(tuple(all[i]))
+        defaultDomain.add((all[i]))
         for j in range(i,len(all)):
-            defaultDomain.add(tuple(all[i], all[j]))
+            defaultDomain.add((all[i], all[j]))
             for k in range(j,len(all)):
-                defaultDomain.add(tuple(all[i], all[j], all[k]))
+                defaultDomain.add((all[i], all[j], all[k]))
 
-    for i in range(len(Level.rooms)):
-        if Level.depth==1 and Level.rooms[i]==Level.up_room:
-            monsterDomain[i] = (())
+    for i in range(len(Level.layout.rooms)):
+        if Level.depth==1 and Level.layout.rooms[i]==Level.up_room:
+            monsterDomain.append({()})
         else:
-            monsterDomain[i] = defaultDomain.copy()
+            monsterDomain.append(defaultDomain.copy())
+    return monsterDomain
 
 # mobtest = [None, "Rat", "Wolf"]
 # domain = list(itertools.combinations_with_replacement(mobtest, 3))
@@ -127,11 +128,11 @@ class ConstraintSolver(BASEOBJ):
         self.level = Level
         self.undoStack = []
         self.potions = 0
-        self.rooms = Level.rooms
+        self.rooms = Level.layout.rooms
         self.monsterAssignment = monsterPossibilities(self.level)
         self.potionAssignment = potionPossibilities(self.level)
-        self.keyAssignment = keysPossibilities(self.level)
-        self.lockAssignment = locksPossibilities(self.level)
+        #self.keyAssignment = keysPossibilities(self.level)
+        #self.lockAssignment = locksPossibilities(self.level)
         self.FullSolve(self.level)
 
     def FullSolve(self, Level):
@@ -169,7 +170,7 @@ class ConstraintSolver(BASEOBJ):
                 else:
                     selection = random.choice(list(self.potionAssignment[index]))
                     self.potions += selection
-                    self.potionAssignment[index] = set(selection)                  
+                    self.potionAssignment[index] = {selection}                  
 
     def solveKeys(self):
         pass
@@ -180,7 +181,7 @@ class ConstraintSolver(BASEOBJ):
             if mobArrangement in setS:
                 newSet.add(mobArrangement)
         if newSet != self.monsterAssignment[i]:
-            self.undoStack.append(tuple(i, self.monsterAssignment[i]))
+            self.undoStack.append((i, self.monsterAssignment[i]))
             self.propagateSurvivability()
 
     def narrowKeys(self, finiteDomain, setS):
@@ -195,7 +196,7 @@ class ConstraintSolver(BASEOBJ):
         for i in range(len(self.monsterAssignment)):
             result = getSingleton(self.monsterAssignment[i])
             if not result:
-                possible.append(tuple(i, self.monsterAssignment[i]))
+                possible.append((i, self.monsterAssignment[i]))
             else:
                 score -= scoring_mobs(result)
         if score <= 0:

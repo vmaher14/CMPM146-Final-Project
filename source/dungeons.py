@@ -6,6 +6,7 @@ import fov
 import creatures
 from functools import cmp_to_key
 import items
+import constraint_gen
 
 class Dungeon(BASEOBJ):
     "An entire multilevel dungeon."
@@ -87,18 +88,20 @@ class Level(BASEOBJ):
         # (Don't add in the first room of the first level)
         rooms = [room for room in self.layout.rooms 
                  if not(self.depth==1 and room==self.up_room)]
-        for (x, y, w, h) in rooms:
-            mobs = d("3d2-3")
-            for m in range(mobs): # CMPM 146 | changed xrange to range
-                for n in range(5):  # Try at most 5 times to find a spot:
-                                    # CMPM 146 | changed xrange to range
-                    i, j = irand(x, x+w-1), irand(y, y+h-1)
-                    if not (self.CreaturesAt(i, j) or self.FeaturesAt(i, j)):
-                        mob = creatures.RandomMob(self.depth)
-                        self.AddCreature(mob, i, j)
-                        break
-                else:
-                    log("Mob bailout on level %s" % self.depth)
+        solver = constraint_gen.ConstraintSolver(self)
+        for i in range(len(rooms)):
+            (x, y, w, h) = rooms[i]
+            monsters = constraint_gen.getSingleton(solver.monsterAssignment[i])
+            if monsters:
+                for monster in monsters: # CMPM 146 | changed xrange to range
+                    for n in range(5):  # Try at most 5 times to find a spot:
+                                        # CMPM 146 | changed xrange to range
+                        i, j = irand(x, x+w-1), irand(y, y+h-1)
+                        if not (self.CreaturesAt(i, j) or self.FeaturesAt(i, j)):
+                            self.AddCreature(monster, i, j)
+                            break
+                    else:
+                        log("Mob bailout on level %s" % self.depth)
 
     
 
