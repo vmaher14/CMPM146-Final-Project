@@ -109,10 +109,6 @@ def monsterPossibilities(Level):
             monsterDomain[i] = (())
         else:
             monsterDomain[i] = defaultDomain.copy()
-            
-
-
-
 
 # mobtest = [None, "Rat", "Wolf"]
 # domain = list(itertools.combinations_with_replacement(mobtest, 3))
@@ -121,8 +117,51 @@ def monsterPossibilities(Level):
 class ConstraintSolver(BASEOBJ):
     def __init__(self, Level):
         self.level = Level
-        self.undo_stack = []
+        self.undoStack = []
+        self.monsterAssignment = monsterPossibilities(self.level)
+        self.potionAssignment = potionPossibilities(self.level)
+        self.keyAssignment = keysPossibilities(self.level)
+        self.lockAssignment = locksPossibilities(self.level)
         self.FullSolve(self.level)
     
     def FullSolve(self, Level):
+        self.solveSurvivability()
+        self.solveKeys()
+
+    def solveSurvivability(self):
+        i = randint(0, len(self.rooms) - 1)
+        while(len(self.monsterAssignment[i]) <= 1):
+            i = randint(0, len(self.rooms) - 1)
+        for mobArrangement in self.monsterAssignment[i]:
+            frame = len(self.undoStack)
+            try: 
+                self.narrowMonsters(mobArrangement)
+                self.solveSurvivability()
+            except:
+                while(len(self.undoStack) > frame):
+                    index, set = self.undoStack.pop()
+                    self.monsterAssignment[index] = set                   
+
+    def solveKeys(self):
+        pass
+
+    def narrowMonsters(self, i, setS):
+        newSet = set()
+        for mobArrangement in self.monsterAssignment[i]:
+            if mobArrangement in setS:
+                newSet.add(mobArrangement)
+        if newSet != self.monsterAssignment[i]:
+            self.undoStack.append(tuple(i, self.monsterAssignment[i]))
+            self.propagateSurvivability()
+
+    def narrowPotions(self, finiteDomain, setS):
+        pass
+
+    def narrowKeys(self, finiteDomain, setS):
+        pass
+
+    def narrowLocks(self, finiteDomain, setS):
+        pass
+
+    def propagateSurvivability(self):
         pass
