@@ -1,6 +1,7 @@
 from random import randrange
 import creatures
 import itertools
+from util import *
 
 # mob = creatures.RandomMob(self.depth)
 
@@ -117,5 +118,11 @@ def monsterPossibilities(Level):
 # domain = list(itertools.combinations_with_replacement(mobtest, 3))
 # print(domain)
     
-
+class ConstraintSolver(BASEOBJ):
+    def __init__(self, Level):
+        self.level = Level
+        self.undo_stack = []
+        self.FullSolve(self.level)
     
+    def FullSolve(self, Level):
+        pass
