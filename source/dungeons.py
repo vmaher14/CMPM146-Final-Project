@@ -3,7 +3,9 @@
 from util import *
 import dungeon_gen
 import fov
-import creatures
+# import creatures
+import player
+
 from functools import cmp_to_key
 import items
 
@@ -12,6 +14,7 @@ class Dungeon(BASEOBJ):
     def __init__(self, game):
         self.game = game
         self.levels = dict()
+        self.kill_count = 0
     def GetLevel(self, i):
         "Returns a Level object for the i'th level of this dungeon."
         try:
@@ -21,8 +24,15 @@ class Dungeon(BASEOBJ):
             return self.levels[i]
     def NewLevel(self, i):
         "Generate the i'th level of the dungeon."
+        print("New level generated")
+        self.kill_count = player.creatures.creatures_killed
+        player.creatures.creatures_killed
+        print(f"kills: {self.kill_count}")
+
         L = Level(self, i)
         return L
+    def LiveCount(self):
+        return self.kill_count
 
 class Level(BASEOBJ):
     "A single level of a dungeon."
@@ -43,6 +53,7 @@ class Level(BASEOBJ):
         # Add some fire because I promised I would:
         x, y = self.RandomSquare()
         self.AddFeature(SmallFire(), x, y)
+        self.removed_creatures = 0
 
         # CMPM 146 | Potions spawn randomly
         for _ in range(2):
@@ -89,12 +100,17 @@ class Level(BASEOBJ):
                  if not(self.depth==1 and room==self.up_room)]
         for (x, y, w, h) in rooms:
             mobs = d("3d2-3")
+            if player.creatures.creatures_killed == 0: # Pacifist
+                mobs -= 1
+            else:
+                mobs += ((self.dungeon.LiveCount() + (self.depth // 2)) // 4)
+            
             for m in range(mobs): # CMPM 146 | changed xrange to range
                 for n in range(5):  # Try at most 5 times to find a spot:
                                     # CMPM 146 | changed xrange to range
                     i, j = irand(x, x+w-1), irand(y, y+h-1)
                     if not (self.CreaturesAt(i, j) or self.FeaturesAt(i, j)):
-                        mob = creatures.RandomMob(self.depth)
+                        mob = player.creatures.RandomMob(self.depth)
                         self.AddCreature(mob, i, j)
                         break
                 else:
@@ -241,6 +257,7 @@ class Level(BASEOBJ):
         for k in keys:
             self.Dirty(self.creatures[k].x, self.creatures[k].y)
             del self.creatures[k]
+            self.removed_creatures += 1
         try:
             self.mob_actions.remove(mob)
         except ValueError: pass

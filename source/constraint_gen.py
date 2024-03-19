@@ -115,13 +115,13 @@ def monsterPossibilities(Level):
 # mobtest = [None, "Rat", "Wolf"]
 # domain = list(itertools.combinations_with_replacement(mobtest, 3))
 # print(domain)
-
+            
 def getSingleton(inSet):
     if(len(inSet) == 1):
         return list(inSet)[0]
     else:
         return False
-
+    
 class ConstraintSolver(BASEOBJ):
     def __init__(self, Level):
         self.level = Level
@@ -133,7 +133,7 @@ class ConstraintSolver(BASEOBJ):
         self.keyAssignment = keysPossibilities(self.level)
         self.lockAssignment = locksPossibilities(self.level)
         self.FullSolve(self.level)
-
+    
     def FullSolve(self, Level):
         self.solveSurvivability()
         self.solveKeys()
@@ -157,22 +157,9 @@ class ConstraintSolver(BASEOBJ):
             except:
                 while(len(self.undoStack) > frame):
                     index, set = self.undoStack.pop()
-                    self.monsterAssignment[index] = set                   
+                    self.monsterAssignment[index] = set                         
 
-    def randomisePotions(self):
-        myList = [i for i in range(len(self.rooms))]
-        random.shuffle(myList)
-        for index in myList:
-            if len(self.potionAssignment[index]) > 1:
-                if(self.potions >=14):
-                    self.potionAssignment[index] = {0}
-                else:
-                    selection = random.choice(list(self.potionAssignment[index]))
-                    self.potions += selection
-                    self.potionAssignment[index] = set(selection)                  
-
-    def solveKeys(self):
-        pass
+    
 
     def narrowMonsters(self, i, setS):
         newSet = set()
@@ -183,13 +170,40 @@ class ConstraintSolver(BASEOBJ):
             self.undoStack.append(tuple(i, self.monsterAssignment[i]))
             self.propagateSurvivability()
 
+    def narrowPotions(self, finiteDomain, setS):
+        newSet = set()
+        if not finiteDomain:
+            raise Exception("Potion Domain Error")
+        for potionArrangement in self.potionAssignment[finiteDomain]:
+            if potionArrangement in setS:
+                newSet.add(potionArrangement)
+        if newSet != self.potionAssignment[finiteDomain]:
+            self.undoStack.append(tuple(finiteDomain, self.potionAssignment[finiteDomain]))
+            self.propagateSurvivability()
+
     def narrowKeys(self, finiteDomain, setS):
-        pass
+        newSet = set()
+        if not finiteDomain:
+            raise Exception("Key Domain Error")
+        for keyArrangement in self.keyAssignment[finiteDomain]:
+            if keyArrangement in setS:
+                newSet.add(keyArrangement)
+        if newSet != self.keyAssignment[finiteDomain]:
+            self.undoStack.append(tuple(finiteDomain, self.keyAssignment[finiteDomain]))
+        
 
     def narrowLocks(self, finiteDomain, setS):
-        pass
+        newSet = set()
+        if not finiteDomain:
+            raise Exception("Lock Domain Error")
+        for lockArrangement in self.lockAssignment[finiteDomain]:
+            if lockArrangement in setS:
+                newSet.add(lockArrangement)
+        if newSet != self.lockAssignment[finiteDomain]:
+            self.undoStack.append(tuple(finiteDomain, self.lockAssignment[finiteDomain]))
 
     def propagateSurvivability(self):
+        pass
         possible = []
         score = 20 + self.potions * 5
         for i in range(len(self.monsterAssignment)):
@@ -209,4 +223,6 @@ class ConstraintSolver(BASEOBJ):
                 Exception
             self.narrowMonsters(index, newSet)
 
-        
+
+
+
