@@ -5,7 +5,7 @@ import itertools
 # mob = creatures.RandomMob(self.depth)
 
 # Create and return a list of mobs appropriate to the given dungeon level.
-def PossibleMobs(depth):
+def possibleMobs(depth):
     mobs = [mob for mob in creatures.all if -1 <= depth - mob.level <= 1]
     return mobs
 
@@ -54,7 +54,7 @@ def scoring_mobs(mob_set):
 def potionPossibilities(Level):
     potionDomain = []
     for i in range(len(Level.layout.rooms)):
-        potionDomain.append((0, 1, 2, 3))
+        potionDomain.append({0, 1, 2})
     return potionDomain
 
 def scoring_potions(num_potions):
@@ -63,13 +63,24 @@ def scoring_potions(num_potions):
 
 # Initializes the domains for the key variable of each room, returning 
 def keysPossibilities(Level):
-    keyDomain = [(0, 1)]
-    return keyDomain
+    keyDomains = []
+    for i in range(len(Level.layout.rooms)):
+        keyDomains.append({0, 1})
+    return keyDomains
 
 def scoring_keys(num_keys):
     score = num_keys
     return score
 
+def locksPossibilities(Level):
+    lockDomains = []
+    for i in range(len(Level.layout.rooms)):
+        lockDomains.append({0, 1})
+    return lockDomains
+
+def scoring_locks(num_locks):
+    score = -1 * num_locks
+    return score
 
 
 
@@ -79,12 +90,25 @@ def scoring_keys(num_keys):
 
 def monsterPossibilities(Level):
     monsterDomain = []
+    #First create the standard domain 
+    #Initialize with an empty tuple representing no monsters in the room
+    defaultDomain = set(tuple())
+    # all possible mobs for this layer
+    all = possibleMobs(Level.depth)
+    # adds the 1s, 2s, and 3s in one fell swoop
+    for i in range(len(all)):
+        defaultDomain.add(tuple(all[i]))
+        for j in range(i,len(all)):
+            defaultDomain.add(tuple(all[i], all[j]))
+            for k in range(j,len(all)):
+                defaultDomain.add(tuple(all[i], all[j], all[k]))
+
     for i in range(len(Level.rooms)):
-        if Level.rooms[i] not(self.depth==1 and room==self.up_room):
+        if Level.depth==1 and Level.rooms[i]==Level.up_room:
             monsterDomain[i] = (())
         else:
-            thisDomain = ()
-            for 
+            monsterDomain[i] = defaultDomain.copy()
+            
 
 
 
